@@ -1,2 +1,3 @@
 ﻿  Main.cpp
-  MCG_GFX_Framework.vcxproj -> C:\Users\mrmag\Documents\Coding#\RayTracer\Debug\MCG_GFX_Framework.exe
+h:\year 3\graphics & computational programming\raytracer\mcg_gfx_framework\hittablelist.h(28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  MCG_GFX_Framework.vcxproj -> H:\Year 3\Graphics & Computational programming\RayTracer\Debug\MCG_GFX_Framework.exe

@@ -3,30 +3,25 @@
 #include <iostream>
 
 #include "MCG_GFX_Lib.h"
-#include "Ray.h"
+#include "Sphere.h"
+#include "HittableList.h"
+#include "float.h"
 
-bool HitSphere(glm::vec3 &center, float radius, Ray& r)
+
+glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world)
 {
-	glm::vec3 oc = r.GetOrigin() - center; // A - C
-	float a = glm::dot(r.GetDirection(), r.GetDirection()); // finding the a, b and c values for b*b - 4ac equation (the discriminant of the quadratic equation)
-	float b = 2.0f * glm::dot(oc, r.GetDirection());
-	float c = glm::dot(oc, oc) - (radius * radius);
-	float discriminant = (b * b) - (4.0f *a*c);
-
-	return (discriminant > 0);
-}
-
-glm::vec3 Colour(Ray& r)
-{
-	if (HitSphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, r))
+	HitRecord rec;
+	if (_world->Hit(_r, 0.0f, 999999.00f, rec))
 	{
-		return glm::vec3(1.0f, 0.0f, 0.0f);
+		return 0.5f*glm::vec3((rec.normal.x) + 1.0f, (rec.normal.y) + 1.0f, (rec.normal.z) + 1.0f); // Scales each unit between 0 and 1
 	}
+	else
+	{
+		glm::vec3 unitDirection = glm::normalize(_r.GetDirection()); // normalizes the ray direction
+		float t = 0.5f* (unitDirection.y + 1.0f); // scales t between 0 and 1
 
-	glm::vec3 unitDirection = glm::normalize(r.GetDirection()); // normalizes the ray direction
-	float t = 0.5f* (unitDirection.y + 1.0f); // scales t between 0 and 1
-
-	return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
+		return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
+	}
 }
 
 int main( int argc, char *argv[] )
@@ -55,6 +50,14 @@ int main( int argc, char *argv[] )
 	glm::vec3 vertical(0.0f, -2.0f, 0.0f);
 	glm::vec3 origin(0.0f, 0.0f, 0.0f);
 
+	std::list<std::shared_ptr<HittableObject>> objectList;
+
+	std::shared_ptr<HittableObject> one = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
+	std::shared_ptr<HittableObject> two = std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f);
+
+	objectList.emplace_back(one);
+	objectList.emplace_back(two);
+	std::shared_ptr<HittableObject> world = std::make_shared<HittableList>(objectList, 2);
 
 	for (int j = 0; j < windowHeight; j++)
 	{
@@ -64,7 +67,9 @@ int main( int argc, char *argv[] )
 			float rayPosY =  float(j) / float(windowHeight);
 
 			Ray r(origin, upperLeftCorner + (rayPosX * horizontal) + (rayPosY * vertical));
-			glm::vec3 col = Colour(r);
+
+			glm::vec3 p = r.PointAtParameter(2.0f);
+			glm::vec3 col = Colour(r, world);
 
 			int ir = int(255.99f * col[0]);
 			int ig = int(255.99f * col[1]);
