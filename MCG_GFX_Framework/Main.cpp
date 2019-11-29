@@ -1,11 +1,13 @@
 
 #include <cmath>
 #include <iostream>
+#include <random>
 
 #include "MCG_GFX_Lib.h"
 #include "Sphere.h"
 #include "HittableList.h"
 #include "float.h"
+#include "Camera.h"
 
 
 glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world)
@@ -13,13 +15,16 @@ glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world)
 	HitRecord rec;
 	if (_world->Hit(_r, 0.0f, 999999.00f, rec))
 	{
-		return 0.5f*glm::vec3((rec.normal.x) + 1.0f, (rec.normal.y) + 1.0f, (rec.normal.z) + 1.0f); // Scales each unit between 0 and 1
+		// Scales each unit between 0 and 1
+		return 0.5f*glm::vec3((rec.normal.x) + 1.0f, (rec.normal.y) + 1.0f, (rec.normal.z) + 1.0f); 
 	}
 	else
 	{
-		glm::vec3 unitDirection = glm::normalize(_r.GetDirection()); // normalizes the ray direction
-		float t = 0.5f* (unitDirection.y + 1.0f); // scales t between 0 and 1
-
+		// normalizes the ray direction
+		glm::vec3 unitDirection = glm::normalize(_r.GetDirection()); 
+		// scales t between 0 and 1
+		float t = 0.5f* (unitDirection.y + 1.0f); 
+		//Uses lerping to give a gradient based on the value t
 		return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
 	}
 }
@@ -28,6 +33,7 @@ int main( int argc, char *argv[] )
 {
 	int windowWidth = 600;
 	int windowHeight = 300;
+	int numberOfSamples = 3;
 
 	// Variable for storing window dimensions
 	glm::ivec2 windowSize( windowWidth, windowHeight);
@@ -41,14 +47,7 @@ int main( int argc, char *argv[] )
 		return -1;
 	}
 
-	// Sets every pixel to the same colour
-	// parameters are RGBA, numbers are from 0 to 255
 	MCG::SetBackground( glm::ivec3(0,0,0) );
-
-	glm::vec3 upperLeftCorner(-2.0f, 1.0f, -1.0f);
-	glm::vec3 horizontal(4.0f, 0.0f, 0.0f);
-	glm::vec3 vertical(0.0f, -2.0f, 0.0f);
-	glm::vec3 origin(0.0f, 0.0f, 0.0f);
 
 	std::list<std::shared_ptr<HittableObject>> objectList;
 
@@ -59,17 +58,26 @@ int main( int argc, char *argv[] )
 	objectList.emplace_back(two);
 	std::shared_ptr<HittableObject> world = std::make_shared<HittableList>(objectList, 2);
 
+	Camera cam;
+
 	for (int j = 0; j < windowHeight; j++)
 	{
 		for (int i = 0; i < windowWidth; i++)
 		{
-			float rayPosX = float(i) / float(windowWidth);
-			float rayPosY =  float(j) / float(windowHeight);
+			glm::vec3 col(0.0f, 0.0f, 0.0f);
+			for (int samples = 0; samples < numberOfSamples; samples++)
+			{
+				std::default_random_engine generator;
+				std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
+				float rayPosX = float(i + distribution(generator)) / float(windowWidth);
+				float rayPosY = float(j + distribution(generator)) / float(windowHeight);
 
-			Ray r(origin, upperLeftCorner + (rayPosX * horizontal) + (rayPosY * vertical));
-
-			glm::vec3 p = r.PointAtParameter(2.0f);
-			glm::vec3 col = Colour(r, world);
+				Ray r = cam.GetRay(rayPosX, rayPosY);
+				glm::vec3 p = r.PointAtParameter(2.0f);
+				col += Colour(r, world);
+			}
+			
+			col /= float(numberOfSamples);
 
 			int ir = int(255.99f * col[0]);
 			int ig = int(255.99f * col[1]);
@@ -79,29 +87,12 @@ int main( int argc, char *argv[] )
 			glm::ivec3 pixelColour = glm::vec3(ir, ig, ib);
 
 			MCG::DrawPixel(pixelPosition, pixelColour);
-			if (i % windowWidth == 0)
-			{
-				//std::cout << ir << " " << ig << " " << ib << std::endl;
-			}
+			
 		}
 
 	}
 
-
-	// Draws a single pixel at the specified coordinates in the specified colour!
-
-
-	// Do any other DrawPixel calls here
-	// ...
-
-	// Displays drawing to screen and holds until user closes window
-	// You must call this after all your drawing calls
-	// Program will exit after this line
 	return MCG::ShowAndHold();
-
-
-
-
 
 	// Advanced access - comment out the above DrawPixel and MCG::ShowAndHold lines, then uncomment the following:
 

@@ -17,21 +17,6 @@ private:
 	int m_listSize;
 };
 
-bool HittableList::Hit(Ray &_r, float _tmin, float _tmax, HitRecord &_rec)
-{
-	HitRecord tempRec;
-	bool hitAnything = false;
-	double closestSoFar = _tmax;
-	for (std::list<std::shared_ptr<HittableObject>>::iterator i = m_list.begin(); i != m_list.end(); ++i)
-	{
-		if ((*i)->Hit(_r, _tmin, closestSoFar, tempRec))
-		{
-			hitAnything = true;
-			closestSoFar = tempRec.t;
-			_rec = tempRec;
-		}
-	}
-	return hitAnything;
-}
+
 
 #endif;
