@@ -1,7 +1,8 @@
 
 #include <cmath>
 #include <iostream>
-#include <random>
+#include <cstdlib>
+#include <ctime>
 
 #include "MCG_GFX_Lib.h"
 #include "Sphere.h"
@@ -9,31 +10,15 @@
 #include "float.h"
 #include "Camera.h"
 
+glm::vec3 RandomInUnitSphere();
+glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world);
 
-glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world)
-{
-	HitRecord rec;
-	if (_world->Hit(_r, 0.0f, 999999.00f, rec))
-	{
-		// Scales each unit between 0 and 1
-		return 0.5f*glm::vec3((rec.normal.x) + 1.0f, (rec.normal.y) + 1.0f, (rec.normal.z) + 1.0f); 
-	}
-	else
-	{
-		// normalizes the ray direction
-		glm::vec3 unitDirection = glm::normalize(_r.GetDirection()); 
-		// scales t between 0 and 1
-		float t = 0.5f* (unitDirection.y + 1.0f); 
-		//Uses lerping to give a gradient based on the value t
-		return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
-	}
-}
 
 int main( int argc, char *argv[] )
 {
 	int windowWidth = 600;
 	int windowHeight = 300;
-	int numberOfSamples = 3;
+	int numberOfSamples = 10;
 
 	// Variable for storing window dimensions
 	glm::ivec2 windowSize( windowWidth, windowHeight);
@@ -58,6 +43,8 @@ int main( int argc, char *argv[] )
 	objectList.emplace_back(two);
 	std::shared_ptr<HittableObject> world = std::make_shared<HittableList>(objectList, 2);
 
+	srand(static_cast <unsigned> (time(0)));
+
 	Camera cam;
 
 	for (int j = 0; j < windowHeight; j++)
@@ -67,10 +54,10 @@ int main( int argc, char *argv[] )
 			glm::vec3 col(0.0f, 0.0f, 0.0f);
 			for (int samples = 0; samples < numberOfSamples; samples++)
 			{
-				std::default_random_engine generator;
-				std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
-				float rayPosX = float(i + distribution(generator)) / float(windowWidth);
-				float rayPosY = float(j + distribution(generator)) / float(windowHeight);
+				float rndm = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
+				float rayPosX = float(i + rndm) / float(windowWidth);
+				rndm = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
+				float rayPosY = float(j + rndm) / float(windowHeight);
 
 				Ray r = cam.GetRay(rayPosX, rayPosY);
 				glm::vec3 p = r.PointAtParameter(2.0f);
@@ -78,6 +65,7 @@ int main( int argc, char *argv[] )
 			}
 			
 			col /= float(numberOfSamples);
+			col = glm::vec3(glm::sqrt(col.x), glm::sqrt(col.y), glm::sqrt(col.z));
 
 			int ir = int(255.99f * col[0]);
 			int ig = int(255.99f * col[1]);
@@ -120,4 +108,37 @@ int main( int argc, char *argv[] )
 	return 0;
 	*/
 
+}
+
+glm::vec3 RandomInUnitSphere()
+{
+	glm::vec3 rtn;
+	do
+	{
+		rtn.x = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
+		rtn.y = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
+		rtn.z = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
+	} while (glm::dot(rtn, rtn) >= 1.0f);
+	return rtn;
+}
+
+glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world)
+{
+	HitRecord rec;
+	if (_world->Hit(_r, 0.001f, 999999.00f, rec))
+	{
+		// Scales each unit between 0 and 1
+		//return 0.5f*glm::vec3((rec.normal.x) + 1.0f, (rec.normal.y) + 1.0f, (rec.normal.z) + 1.0f); 
+		glm::vec3 target = rec.p + rec.normal + RandomInUnitSphere();
+		return 0.5f * Colour(Ray(rec.p, target - rec.p), _world);
+	}
+	else
+	{
+		// normalizes the ray direction
+		glm::vec3 unitDirection = glm::normalize(_r.GetDirection());
+		// scales t between 0 and 1
+		float t = 0.5f* (unitDirection.y + 1.0f);
+		//Uses lerping to give a gradient based on the value t
+		return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
+	}
 }
