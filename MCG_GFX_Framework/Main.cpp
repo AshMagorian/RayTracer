@@ -10,15 +10,21 @@
 #include "float.h"
 #include "Camera.h"
 
-glm::vec3 RandomInUnitSphere();
-glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world);
+#include "Material.h"
+#include "Lambertian.h"
+#include "Metal.h"
+
+// Returns a random point inside of a unit radius sphere
+//glm::vec3 RandomInUnitSphere();
+
+glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world, int _depth);
 
 
 int main( int argc, char *argv[] )
 {
 	int windowWidth = 600;
 	int windowHeight = 300;
-	int numberOfSamples = 10;
+	int numberOfSamples = 50;
 
 	// Variable for storing window dimensions
 	glm::ivec2 windowSize( windowWidth, windowHeight);
@@ -36,16 +42,23 @@ int main( int argc, char *argv[] )
 
 	std::list<std::shared_ptr<HittableObject>> objectList;
 
-	std::shared_ptr<HittableObject> one = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
-	std::shared_ptr<HittableObject> two = std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f);
+	std::shared_ptr<HittableObject> one = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.3f, 0.3f)));
+	std::shared_ptr<HittableObject> two = std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.8f, 0.0f)));
+	std::shared_ptr<HittableObject> three = std::make_shared<Sphere>(glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.8f, 0.6f, 0.2f)));
+	std::shared_ptr<HittableObject> four = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.8f, 0.8f, 0.8f)));
 
 	objectList.emplace_back(one);
 	objectList.emplace_back(two);
-	std::shared_ptr<HittableObject> world = std::make_shared<HittableList>(objectList, 2);
+	objectList.emplace_back(three);
+	objectList.emplace_back(four);
+	std::shared_ptr<HittableObject> world = std::make_shared<HittableList>(objectList, 4);
 
 	srand(static_cast <unsigned> (time(0)));
 
 	Camera cam;
+	int pixelCount = 0;
+	float newPixelPercent = 0.0f;
+	float oldPixelPercent = 0.0f;
 
 	for (int j = 0; j < windowHeight; j++)
 	{
@@ -61,7 +74,7 @@ int main( int argc, char *argv[] )
 
 				Ray r = cam.GetRay(rayPosX, rayPosY);
 				glm::vec3 p = r.PointAtParameter(2.0f);
-				col += Colour(r, world);
+				col += Colour(r, world, 0);
 			}
 			
 			col /= float(numberOfSamples);
@@ -75,7 +88,16 @@ int main( int argc, char *argv[] )
 			glm::ivec3 pixelColour = glm::vec3(ir, ig, ib);
 
 			MCG::DrawPixel(pixelPosition, pixelColour);
-			
+
+
+
+			newPixelPercent = (float(pixelCount) / (float(windowWidth) * float(windowHeight)))* 100.0f;
+			if (int(newPixelPercent) > int(oldPixelPercent))
+			{
+				std::cout << int(newPixelPercent) << "%" << std::endl;
+			}
+			pixelCount++;
+			oldPixelPercent = newPixelPercent;
 		}
 
 	}
@@ -110,27 +132,37 @@ int main( int argc, char *argv[] )
 
 }
 
-glm::vec3 RandomInUnitSphere()
-{
-	glm::vec3 rtn;
-	do
-	{
-		rtn.x = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
-		rtn.y = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
-		rtn.z = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
-	} while (glm::dot(rtn, rtn) >= 1.0f);
-	return rtn;
-}
+//glm::vec3 RandomInUnitSphere()
+//{
+//	glm::vec3 rtn;
+//	do
+//	{
+//		//Fill the vec3 with 3 randomly generated floats ranging from -1 to 1
+//		rtn.x = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
+//		rtn.y = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
+//		rtn.z = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
+//	} while (glm::dot(rtn, rtn) >= 1.0f); //rejects if the point is located outside of the sphere
+//	return rtn;
+//}
 
-glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world)
+glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world, int _depth)
 {
 	HitRecord rec;
 	if (_world->Hit(_r, 0.001f, 999999.00f, rec))
 	{
-		// Scales each unit between 0 and 1
-		//return 0.5f*glm::vec3((rec.normal.x) + 1.0f, (rec.normal.y) + 1.0f, (rec.normal.z) + 1.0f); 
-		glm::vec3 target = rec.p + rec.normal + RandomInUnitSphere();
-		return 0.5f * Colour(Ray(rec.p, target - rec.p), _world);
+		Ray scattered;
+		glm::vec3 attenuation;
+		if (_depth < 50 && rec.mat->Scatter(_r, rec, attenuation, scattered))
+		{
+			return attenuation * Colour(scattered, _world, _depth + 1);
+		}
+		else { return glm::vec3(0.0f, 0.0f, 0.0f); }
+
+		//Generates random ray to simulate light reflecting off of the sphere
+		//glm::vec3 target = rec.p + rec.normal + RandomInUnitSphere( );
+
+		//Checks if that ray collides with another object. The more the ray reflects the darker the colour is (this simulates light being absorbed)
+		//return 0.5f * Colour(Ray(rec.p, target - rec.p), _world);
 	}
 	else
 	{
@@ -139,6 +171,7 @@ glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world)
 		// scales t between 0 and 1
 		float t = 0.5f* (unitDirection.y + 1.0f);
 		//Uses lerping to give a gradient based on the value t
+		//return ((1.0f - t) *glm::vec3(1.0f, 0.1f, 0.0f)) + (t * glm::vec3( 1.0f, 0.0f, 1.0f));
 		return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
 	}
 }

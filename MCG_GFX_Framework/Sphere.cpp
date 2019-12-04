@@ -1,9 +1,10 @@
 #include "Sphere.h"
 
-Sphere::Sphere(glm::vec3 _centre, float _radius)
+Sphere::Sphere(glm::vec3 _centre, float _radius, std::shared_ptr<Material> _mat)
 {
 	m_centre = _centre;
 	m_radius = _radius;
+	m_mat = _mat;
 }
 
 bool Sphere::Hit(Ray &_r, float _tmin, float _tmax, HitRecord &_rec)
@@ -21,6 +22,8 @@ bool Sphere::Hit(Ray &_r, float _tmin, float _tmax, HitRecord &_rec)
 	//A negative discriminant means the ray does not hit the sphere
 	if (discriminant > 0.0f)
 	{
+		_rec.mat = m_mat;
+
 		//Calculates the first value of the quadratic equation
 		float temp = (-b - glm::sqrt(discriminant)) / (2 * a);
 
