@@ -13,6 +13,7 @@
 #include "Material.h"
 #include "Lambertian.h"
 #include "Metal.h"
+#include "Dielectric.h"
 
 // Returns a random point inside of a unit radius sphere
 //glm::vec3 RandomInUnitSphere();
@@ -24,7 +25,7 @@ int main( int argc, char *argv[] )
 {
 	int windowWidth = 600;
 	int windowHeight = 300;
-	int numberOfSamples = 50;
+	int numberOfSamples = 50 ;
 
 	// Variable for storing window dimensions
 	glm::ivec2 windowSize( windowWidth, windowHeight);
@@ -44,8 +45,9 @@ int main( int argc, char *argv[] )
 
 	std::shared_ptr<HittableObject> one = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.3f, 0.3f)));
 	std::shared_ptr<HittableObject> two = std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.8f, 0.0f)));
-	std::shared_ptr<HittableObject> three = std::make_shared<Sphere>(glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.8f, 0.6f, 0.2f)));
-	std::shared_ptr<HittableObject> four = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.8f, 0.8f, 0.8f)));
+	std::shared_ptr<HittableObject> three = std::make_shared<Sphere>(glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.8f, 0.6f, 0.2f), 0.3f));
+	std::shared_ptr<HittableObject> four = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Dielectric>(1.5f));
+
 
 	objectList.emplace_back(one);
 	objectList.emplace_back(two);
@@ -152,8 +154,11 @@ glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world, int _depth)
 	{
 		Ray scattered;
 		glm::vec3 attenuation;
+
+		//Limits the number of reflections of a single ray to 50
 		if (_depth < 50 && rec.mat->Scatter(_r, rec, attenuation, scattered))
 		{
+			// Attenuation is the light which the object absorbs (Which gives it colour). This vec3 is multiplied by the colour calculated from the reflected ray
 			return attenuation * Colour(scattered, _world, _depth + 1);
 		}
 		else { return glm::vec3(0.0f, 0.0f, 0.0f); }
