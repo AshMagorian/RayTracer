@@ -1,5 +1,5 @@
 #include "Material.h"
-
+#include <random>
 
 glm::vec3 Material::RandomInUnitSphere()
 {
@@ -12,6 +12,24 @@ glm::vec3 Material::RandomInUnitSphere()
 		rtn.z = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
 	} while (glm::dot(rtn, rtn) >= 1.0f); //rejects if the point is located outside of the sphere
 	return rtn;
+
+	//std::default_random_engine generator;
+	//std::normal_distribution<float> distribution(0.0f, 1.0f);
+	//
+	//float u = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
+	//
+	//glm::vec3 rtn;
+	//rtn.x = distribution(generator);
+	//rtn.y = distribution(generator);
+	//rtn.z = distribution(generator);
+	//
+	//float mag = glm::sqrt(rtn.x*rtn.x + rtn.y*rtn.y + rtn.z*rtn.z);
+	//rtn.x /= mag; rtn.y /= mag; rtn.z /= mag;
+	//
+	//float c = glm::pow(u , 1/3);
+	//rtn.x *= c; rtn.y *= c; rtn.z *= c;
+	//
+	//return rtn;
 }
 
 glm::vec3 Material::Reflect(glm::vec3& _collidingVec, glm::vec3 _normal)

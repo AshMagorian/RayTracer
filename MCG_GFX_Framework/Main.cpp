@@ -9,23 +9,18 @@
 #include "HittableList.h"
 #include "float.h"
 #include "Camera.h"
+#include "Tracer.h"
 
 #include "Material.h"
 #include "Lambertian.h"
 #include "Metal.h"
 #include "Dielectric.h"
 
-// Returns a random point inside of a unit radius sphere
-//glm::vec3 RandomInUnitSphere();
-
-glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world, int _depth);
-
-
 int main( int argc, char *argv[] )
 {
 	int windowWidth = 600;
 	int windowHeight = 300;
-	int numberOfSamples = 50 ;
+	int numberOfSamples = 10 ;
 
 	// Variable for storing window dimensions
 	glm::ivec2 windowSize( windowWidth, windowHeight);
@@ -57,6 +52,7 @@ int main( int argc, char *argv[] )
 
 	srand(static_cast <unsigned> (time(0)));
 
+	Tracer tracer;
 	Camera cam;
 	int pixelCount = 0;
 	float newPixelPercent = 0.0f;
@@ -76,7 +72,7 @@ int main( int argc, char *argv[] )
 
 				Ray r = cam.GetRay(rayPosX, rayPosY);
 				glm::vec3 p = r.PointAtParameter(2.0f);
-				col += Colour(r, world, 0);
+				col += tracer.ColourPixel(r, world, 0);
 			}
 			
 			col /= float(numberOfSamples);
@@ -106,77 +102,5 @@ int main( int argc, char *argv[] )
 
 	return MCG::ShowAndHold();
 
-	// Advanced access - comment out the above DrawPixel and MCG::ShowAndHold lines, then uncomment the following:
-
-	/*
-	// Variable to keep track of time
-	float timer = 0.0f;
-
-	// This is our game loop
-	// It will run until the user presses 'escape' or closes the window
-	while( MCG::ProcessFrame() )
-	{
-		// Set every pixel to the same colour
-		MCG::SetBackground( glm::ivec3( 0, 0, 0 ) );
-
-		// Change our pixel's X coordinate according to time
-		pixelPosition.x = (windowSize.x / 2) + (int)(sin(timer) * 100.0f);
-		// Update our time variable
-		timer += 1.0f / 60.0f;
-
-		// Draw the pixel to the screen
-		MCG::DrawPixel( pixelPosition, pixelColour );
-
-	}
-
-	return 0;
-	*/
-
 }
 
-//glm::vec3 RandomInUnitSphere()
-//{
-//	glm::vec3 rtn;
-//	do
-//	{
-//		//Fill the vec3 with 3 randomly generated floats ranging from -1 to 1
-//		rtn.x = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
-//		rtn.y = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
-//		rtn.z = (-1.0f) + static_cast<float> (rand()) / (static_cast<float>(RAND_MAX / (2.0f)));
-//	} while (glm::dot(rtn, rtn) >= 1.0f); //rejects if the point is located outside of the sphere
-//	return rtn;
-//}
-
-glm::vec3 Colour(Ray& _r, std::shared_ptr<HittableObject> _world, int _depth)
-{
-	HitRecord rec;
-	if (_world->Hit(_r, 0.001f, 999999.00f, rec))
-	{
-		Ray scattered;
-		glm::vec3 attenuation;
-
-		//Limits the number of reflections of a single ray to 50
-		if (_depth < 50 && rec.mat->Scatter(_r, rec, attenuation, scattered))
-		{
-			// Attenuation is the light which the object absorbs (Which gives it colour). This vec3 is multiplied by the colour calculated from the reflected ray
-			return attenuation * Colour(scattered, _world, _depth + 1);
-		}
-		else { return glm::vec3(0.0f, 0.0f, 0.0f); }
-
-		//Generates random ray to simulate light reflecting off of the sphere
-		//glm::vec3 target = rec.p + rec.normal + RandomInUnitSphere( );
-
-		//Checks if that ray collides with another object. The more the ray reflects the darker the colour is (this simulates light being absorbed)
-		//return 0.5f * Colour(Ray(rec.p, target - rec.p), _world);
-	}
-	else
-	{
-		// normalizes the ray direction
-		glm::vec3 unitDirection = glm::normalize(_r.GetDirection());
-		// scales t between 0 and 1
-		float t = 0.5f* (unitDirection.y + 1.0f);
-		//Uses lerping to give a gradient based on the value t
-		//return ((1.0f - t) *glm::vec3(1.0f, 0.1f, 0.0f)) + (t * glm::vec3( 1.0f, 0.0f, 1.0f));
-		return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
-	}
-}
