@@ -13,20 +13,29 @@ glm::vec3 Material::RandomInUnitSphere()
 	} while (glm::dot(rtn, rtn) >= 1.0f); //rejects if the point is located outside of the sphere
 	return rtn;
 
-	//std::default_random_engine generator;
-	//std::normal_distribution<float> distribution(0.0f, 1.0f);
+	//std::random_device generator;
+	//std::normal_distribution<float> distribution(0.5f, 0.125f);
 	//
 	//float u = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
 	//
 	//glm::vec3 rtn;
 	//rtn.x = distribution(generator);
+	////printf("%f \n",rtn.x);
+	//
 	//rtn.y = distribution(generator);
+	////printf("%f \n", rtn.y);
+	//
 	//rtn.z = distribution(generator);
+	////printf("%f \n", rtn.z);
+	//
 	//
 	//float mag = glm::sqrt(rtn.x*rtn.x + rtn.y*rtn.y + rtn.z*rtn.z);
 	//rtn.x /= mag; rtn.y /= mag; rtn.z /= mag;
 	//
-	//float c = glm::pow(u , 1/3);
+	//float c = glm::pow(u , 1.0f/3);
+	////printf("u = %f \n", u);
+	////printf("c = %f \n", c);
+	//
 	//rtn.x *= c; rtn.y *= c; rtn.z *= c;
 	//
 	//return rtn;

@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Dielectric.cpp" />
     <ClCompile Include="HittableList.cpp" />
     <ClCompile Include="Lambertian.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Tracer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Dielectric.h" />
     <ClInclude Include="HittableList.h" />

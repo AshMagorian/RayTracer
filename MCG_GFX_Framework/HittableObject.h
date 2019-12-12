@@ -18,6 +18,9 @@ struct HitRecord
 class HittableObject
 {
 public:
+
+	virtual void SetupObjects() {}
+
 	virtual bool Hit(Ray &_r, float _tmin, float _tmax, HitRecord &_rec) { return 0; }
 };
 

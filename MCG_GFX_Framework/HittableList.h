@@ -10,7 +10,9 @@ class HittableList : public HittableObject
 {
 public:
 	HittableList() {}
-	HittableList(std::list<std::shared_ptr<HittableObject>> _list, int _size) { m_list = _list; m_listSize = _size; }
+
+	void SetupObjects();
+
 	virtual bool Hit(Ray &r, float tmin, float tmax, HitRecord &rec);
 private:
 	std::list<std::shared_ptr<HittableObject>> m_list;
