@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <thread>
+#include <list>
 
 #include "MCG_GFX_Lib.h"
 #include "Sphere.h"
@@ -19,8 +21,8 @@
 
 void Application::Init()
 {
-	m_windowWidth = 600;
-	m_windowHeight = 300;
+	m_windowWidth = 1200;
+	m_windowHeight = 600;
 	glm::ivec2 windowSize(m_windowWidth, m_windowHeight);
 	if (!MCG::Init(windowSize))
 	{
@@ -46,17 +48,37 @@ int Application::Run()
 	m_newPixelPercent = 0.0f;
 	m_oldPixelPercent = 0.0f;
 
-	for (m_currentPixel_y = 0; m_currentPixel_y < m_windowHeight; m_currentPixel_y++)
+	std::cout << std::thread::hardware_concurrency() << " cores detected";
+	m_numberOfThreads = std::thread::hardware_concurrency();
+
+
+	m_blockHeight = m_windowHeight / m_numberOfThreads;
+
+
+	std::list<std::thread> threads;
+
+	for (int blockNumber = 0; blockNumber < m_numberOfThreads; blockNumber++)
 	{
-		DrawRow();
+		//DrawBlock(blockNumber);
+		threads.push_back(std::thread(&Application::DrawBlock, this, blockNumber));
 	}
+
+	for (std::list<std::thread>::iterator i = threads.begin(); i != threads.end(); ++i)
+	{
+		i->join();
+	}
+
+	//for (m_currentPixel_y = 0; m_currentPixel_y < m_windowHeight; m_currentPixel_y++)
+	//{
+	//	DrawRow();
+	//}
 
 	return MCG::ShowAndHold();
 }
 
 void Application::DrawRow()
 {
-	for (m_currentPixel_x = 0; m_currentPixel_x < m_windowWidth; m_currentPixel_x++)
+	for (int m_currentPixel_x = 0; m_currentPixel_x < m_windowWidth; m_currentPixel_x++)
 	{
 		glm::vec3 col(0.0f, 0.0f, 0.0f);
 		for (int samples = 0; samples < m_numberOfSamples; samples++)
@@ -83,12 +105,60 @@ void Application::DrawRow()
 
 		MCG::DrawPixel(pixelPosition, pixelColour);
 
-		m_newPixelPercent = (float(m_pixelCount) / (float(m_windowWidth) * float(m_windowHeight)))* 100.0f;
-		if (int(m_newPixelPercent) > int(m_oldPixelPercent))
-		{
-			std::cout << int(m_newPixelPercent) << "%" << std::endl;
-		}
-		m_pixelCount++;
-		m_oldPixelPercent = m_newPixelPercent;
+		//m_newPixelPercent = (float(m_pixelCount) / (float(m_windowWidth) * float(m_windowHeight)))* 100.0f;
+		//if (int(m_newPixelPercent) > int(m_oldPixelPercent))
+		//{
+		//	std::cout << int(m_newPixelPercent) << "%" << std::endl;
+		//}
+		//m_pixelCount++;
+		//m_oldPixelPercent = m_newPixelPercent;
 	}
+}
+
+void Application::DrawBlock(int _blockNumber)
+{
+	int currentPixel_y = 0;
+	for (int j = 0; j < m_blockHeight; j++)
+	{
+		currentPixel_y = (m_blockHeight * _blockNumber) + j;
+		for (int currentPixel_x = 0; currentPixel_x < m_windowWidth; currentPixel_x++)
+		{
+			glm::vec3 col(0.0f, 0.0f, 0.0f);
+			for (int samples = 0; samples < m_numberOfSamples; samples++)
+			{
+				float rndm = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
+				float rayPosX = float(currentPixel_x + rndm) / float(m_windowWidth);
+				rndm = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
+				float rayPosY = float(currentPixel_y + rndm) / float(m_windowHeight);
+
+				Ray r = m_cam->GetRay(rayPosX, rayPosY);
+				glm::vec3 p = r.PointAtParameter(2.0f);
+				col += m_tracer->ColourPixel(r, m_world, 0);
+			}
+
+			col /= float(m_numberOfSamples);
+			col = glm::vec3(glm::sqrt(col.x), glm::sqrt(col.y), glm::sqrt(col.z));
+
+			int ir = int(255.99f * col[0]);
+			int ig = int(255.99f * col[1]);
+			int ib = int(255.99f * col[2]);
+
+			glm::ivec2 pixelPosition = glm::vec2(currentPixel_x, currentPixel_y);
+			glm::ivec3 pixelColour = glm::vec3(ir, ig, ib);
+
+			mtx.lock();
+			MCG::DrawPixel(pixelPosition, pixelColour);
+			
+
+			m_newPixelPercent = (float(m_pixelCount) / (float(m_windowWidth) * float(m_windowHeight)))* 100.0f;
+			if (int(m_newPixelPercent) > int(m_oldPixelPercent))
+			{
+				std::cout << int(m_newPixelPercent) << "%" << std::endl;
+			}
+			m_pixelCount++;
+			m_oldPixelPercent = m_newPixelPercent;
+			mtx.unlock();
+		}
+	}
+	
 }
