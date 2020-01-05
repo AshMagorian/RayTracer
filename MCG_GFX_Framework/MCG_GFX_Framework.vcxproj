@@ -22,19 +22,19 @@
     <ProjectGuid>{EDAE6090-F60E-444B-B66D-13979FD63FE3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MCG_GFX_Framework</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -156,7 +156,9 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MCG_GFX_Lib.cpp" />
     <ClCompile Include="Metal.cpp" />
+    <ClCompile Include="SetupMenu.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Tracer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,7 +172,9 @@
     <ClInclude Include="MCG_GFX_Lib.h" />
     <ClInclude Include="Metal.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="SetupMenu.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Tracer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
