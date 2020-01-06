@@ -16,6 +16,7 @@ private:
 	float m_radius;
 
 	std::shared_ptr<Material> m_mat;
+
 };
 
 

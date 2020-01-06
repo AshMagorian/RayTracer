@@ -1,6 +1,7 @@
 #include "HittableList.h"
 
 #include "Sphere.h"
+#include "Plane.h"
 
 #include "Lambertian.h"
 #include "Metal.h"
@@ -9,10 +10,10 @@
 void HittableList::SetupObjects()
 {
 	std::shared_ptr<HittableObject> one = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.3f, 0.3f)));
-	std::shared_ptr<HittableObject> two = std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, std::make_shared<Lambertian>(glm::vec3(0.9f, 0.4f, 0.0f)));
+	std::shared_ptr<HittableObject> two = std::make_shared<Plane>(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.4f, 0.0f)));
 	std::shared_ptr<HittableObject> three = std::make_shared<Sphere>(glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.9f, 0.1f, 0.2f), 0.3f));
 	std::shared_ptr<HittableObject> four = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Dielectric>(2.0f));
-	std::shared_ptr<HittableObject> five = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -50.0f), 30.0f, std::make_shared<Metal>(glm::vec3(0.2f, 0.6f, 0.5f), 0.0f));
+	std::shared_ptr<HittableObject> five = std::make_shared<Sphere>(glm::vec3(-1.5f, 1.0f, -3.0f), 1.5f, std::make_shared<Metal>(glm::vec3(0.2f, 0.6f, 0.5f), 0.0f));
 
 	m_list.emplace_back(one);
 	m_list.emplace_back(two);

@@ -9,10 +9,10 @@ class Material;
 
 struct HitRecord
 {
-	float t;
-	glm::vec3 p;
-	glm::vec3 normal;
-	std::shared_ptr<Material> mat;
+	float t; // How far along the ray 
+	glm::vec3 p; // Collision point
+	glm::vec3 normal; // contact normal
+	std::shared_ptr<Material> mat; // Material of the hit object
 };
 
 class HittableObject

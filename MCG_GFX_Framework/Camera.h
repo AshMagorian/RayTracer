@@ -9,10 +9,10 @@ class Camera
 public:
 	Camera()
 	{
-		m_upperLeftCorner = glm::vec3(-2.0f, 1.0f, -1.0f);
+		m_upperLeftCorner = glm::vec3(-2.0f, 1.0f, -1.0f) - glm::vec3(0.0f, -0.2f, -0.5f);
 		m_horizontal = glm::vec3(4.0f, 0.0f, 0.0f);
 		m_vertical = glm::vec3(0.0f, -2.0f, 0.0f);
-		m_origin = glm::vec3(0.0f, 0.0f, 0.0f);
+		m_origin = glm::vec3(0.0f, 0.0f, 0.0f) - glm::vec3(0.0f, -0.2f, -0.5f);
 	}
 	~Camera() {}
 

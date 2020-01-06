@@ -41,8 +41,6 @@ private:
 	int m_windowWidth;
 	int m_windowHeight;
 
-	//int m_currentPixel_y;
-
 	int m_numberOfSamples;
 
 	int m_threadMethod;
@@ -55,6 +53,9 @@ private:
 
 	std::mutex mtx;
 
+	clock_t m_start;
+	clock_t m_end;
+	double time_elapsed;
 
 	int m_pixelCount;
 	float m_newPixelPercent;

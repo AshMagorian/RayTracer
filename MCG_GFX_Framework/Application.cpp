@@ -46,12 +46,18 @@ int Application::Run()
 	m_newPixelPercent = 0.0f;
 	m_oldPixelPercent = 0.0f;
 
+	m_start = clock();
+
 	switch (m_threadMethod)
 	{
 	case 1: BasicMultithreadingMethod(); break;
 	case 2: ThreadPoolMethod(); break;
 	default: break;
 	}
+
+	m_end = clock();
+	time_elapsed = double(m_end - m_start);
+	std::cout << "Time taken to render (ms): " << time_elapsed << std::endl;
 
 	return MCG::ShowAndHold();
 }
@@ -140,7 +146,10 @@ void Application::DrawPixel(int _currentPixel_x, int _currentPixel_y)
 		m_newPixelPercent = (float(m_pixelCount) / (float(m_windowWidth) * float(m_windowHeight)))* 100.0f;
 		if (int(m_newPixelPercent) > int(m_oldPixelPercent + 9.0f))
 		{
-			std::cout << int(m_newPixelPercent) << "%" << std::endl;
+			m_end = clock();
+			double old_time = time_elapsed;
+			time_elapsed = double(m_end - m_start);
+			std::cout << int(m_newPixelPercent) << "% \t Time elapsed(ms): " << time_elapsed << " (+ " << time_elapsed - old_time << "ms)" << std::endl;
 			m_oldPixelPercent = m_newPixelPercent;
 		}
 		m_pixelCount++;
