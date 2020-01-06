@@ -1,6 +1,18 @@
 ﻿  Application.cpp
+  Box.cpp
+  Dielectric.cpp
+  HittableList.cpp
+h:\year 3\graphics & computational programming\raytracer\mcg_gfx_framework\hittablelist.cpp(38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  Lambertian.cpp
   Main.cpp
+  Material.cpp
+  MCG_GFX_Lib.cpp
+  Metal.cpp
+  Plane.cpp
   SetupMenu.cpp
+h:\year 3\graphics & computational programming\raytracer\mcg_gfx_framework\setupmenu.cpp(129): warning C4018: '>': signed/unsigned mismatch
+  Sphere.cpp
   ThreadPool.cpp
+  Tracer.cpp
   Generating Code...
-  MCG_GFX_Framework.vcxproj -> C:\Users\mrmag\Documents\Coding#\RayTracer\Debug\MCG_GFX_Framework.exe
+  MCG_GFX_Framework.vcxproj -> H:\Year 3\Graphics & Computational programming\RayTracer\Debug\MCG_GFX_Framework.exe
