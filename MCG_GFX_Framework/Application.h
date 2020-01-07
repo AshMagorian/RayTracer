@@ -28,6 +28,8 @@ public:
 	void SetSamples(int _option) { m_numberOfSamples = _option; }
 	void SetThreads(int _option) { m_numberOfThreads = _option; }
 	void SetThreadMethod(int _option) { m_threadMethod = _option; }
+	void SetDepth(int _depth) { m_depth = _depth; }
+	void SetScene(int _scene) { m_scene = _scene; }
 
 	void BasicMultithreadingMethod();
 	void ThreadPoolMethod();
@@ -42,6 +44,8 @@ private:
 	int m_windowHeight;
 
 	int m_numberOfSamples;
+	int m_depth;
+	int m_scene;
 
 	int m_threadMethod;
 	int m_numberOfThreads;

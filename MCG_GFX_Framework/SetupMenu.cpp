@@ -10,6 +10,8 @@ SetupMenu::SetupMenu()
 	m_screenSizeOption = 2;
 	m_numberOfThreads = std::thread::hardware_concurrency();
 	m_multithreadingMethod = 1;
+	m_depth = 50;
+	m_scene = 1;
 }
 
 void SetupMenu::MainMenu(std::shared_ptr<Application> _app)
@@ -19,7 +21,7 @@ void SetupMenu::MainMenu(std::shared_ptr<Application> _app)
 	do 
 	{
 		PrintMenu();
-		int option = ValidOptionSelect(5);
+		int option = ValidOptionSelect(7);
 
 		switch (option)
 		{
@@ -27,7 +29,9 @@ void SetupMenu::MainMenu(std::shared_ptr<Application> _app)
 		case 2: ChangeSamples(); break;
 		case 3: ChangeThreads(); break;
 		case 4: ChangeThreadMethod(); break;
-		case 5: exitflag = true; break;
+		case 5: ChangeDepth(); break;
+		case 6: ChangeScene(); break;
+		case 7: exitflag = true; break;
 		default: break; 
 		}
 
@@ -37,6 +41,8 @@ void SetupMenu::MainMenu(std::shared_ptr<Application> _app)
 	_app->SetSamples(m_sampleNumber);
 	_app->SetThreads(m_numberOfThreads);
 	_app->SetThreadMethod(m_multithreadingMethod);
+	_app->SetDepth(m_depth);
+	_app->SetScene(m_scene);
 }
 
 void SetupMenu::PrintMenu()
@@ -62,11 +68,14 @@ void SetupMenu::PrintMenu()
 		"[4] Multithreading method    (Currently selected: ";
 	switch (m_multithreadingMethod)
 	{
-	case 1: std::cout << "Threads divided to screen blocks) \n\n"; break;
-	case 2: std::cout << "Threadpool method) \n\n"; break;
+	case 1: std::cout << "Threads divided to screen blocks) \n"; break;
+	case 2: std::cout << "Threadpool method) \n"; break;
 	default: break;
 	}
-	std::cout << "[5] Start Rendering\n\n"
+	std::cout <<
+		"[5] Maximum number of ray reflections   (Currently selected: " << m_depth << ")\n"
+		"[6] Which scene to draw   (Currently selected: Scene " << m_scene << ")\n\n"
+		"[7] Start Rendering\n\n"
 		"Select your option:\n\n";
 }
 
@@ -102,13 +111,13 @@ void SetupMenu::ChangeScreenSize()
 void SetupMenu::ChangeSamples()
 {
 	system("CLS");
-	std::cout << "Enter the amount of samples you would like to use per pixel (max 500):\n\n";
+	std::cout << "Enter the amount of samples you would like to use per pixel (max 5000):\n\n";
 
 	int option = 0;
 
 	std::cin >> option;
 
-	while (option < 1 || option > 500)
+	while (option < 1 || option > 5000)
 	{
 		std::cout << "\nInvalid input! Try again!\n";
 		std::cin >> option;
@@ -142,4 +151,32 @@ void SetupMenu::ChangeThreadMethod()
 
 	int option = ValidOptionSelect(2);
 	m_multithreadingMethod = option;
+}
+
+void SetupMenu::ChangeDepth()
+{
+	system("CLS");
+	std::cout << "Enter the maximum abount of reflections per ray(max 50):\n\n";
+
+	int option = 0;
+
+	std::cin >> option;
+
+	while (option < 1 || option > 50)
+	{
+		std::cout << "\nInvalid input! Try again!\n";
+		std::cin >> option;
+	}
+
+	m_depth = option;
+}
+
+void SetupMenu::ChangeScene()
+{
+	system("CLS");
+	std::cout << "[1] Scene 1 (Lit from background)\n"
+		"[2] Scene 2 (Lit room)(Takes longer to render)\n";
+
+	int option = ValidOptionSelect(2);
+	m_scene = option;
 }

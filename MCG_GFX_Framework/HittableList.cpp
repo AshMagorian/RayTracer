@@ -7,24 +7,37 @@
 #include "Lambertian.h"
 #include "Metal.h"
 #include "Dielectric.h"
+#include "DiffuseLight.h"
 
-void HittableList::SetupObjects()
+void HittableList::SetupObjects(int _scene)
 {
-	std::shared_ptr<HittableObject> one = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.3f, 0.3f)));
-	std::shared_ptr<HittableObject> two = std::make_shared<Plane>(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.4f, 0.0f)));
-	std::shared_ptr<HittableObject> three = std::make_shared<Sphere>(glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.9f, 0.1f, 0.2f), 0.3f));
-	std::shared_ptr<HittableObject> four = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Dielectric>(2.0f));
-	std::shared_ptr<HittableObject> five = std::make_shared<Sphere>(glm::vec3(-1.5f, 1.0f, -3.0f), 1.5f, std::make_shared<Metal>(glm::vec3(0.2f, 0.6f, 0.5f), 0.0f));
+	//set up spheres
+	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.3f, 0.3f))));
+	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.9f, 0.1f, 0.2f), 0.3f)));
+	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Dielectric>(2.0f)));
+	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(-1.5f, 1.0f, -3.0f), 1.5f, std::make_shared<Metal>(glm::vec3(0.2f, 0.6f, 0.5f), 0.0f)));
+	//set up cubes
+	m_list.emplace_back(std::make_shared<Box>(glm::vec3(0.8f, -0.4f, -0.5f), 0.2f, 0.2f, 0.2f, std::make_shared<Metal>(glm::vec3(0.9f, 0.9f, 0.9f), 0.0f)));
+	m_list.emplace_back(std::make_shared<Box>(glm::vec3(-0.5f, -0.4f, -0.5f), 0.2f, 0.2f, 0.2f, std::make_shared<Lambertian>(glm::vec3(0.1f, 0.9f, 0.3f))));
+	//set up planes
+	//floor
+	m_list.emplace_back(std::make_shared<Plane>(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.4f, 0.0f))));
 
-	std::shared_ptr<HittableObject> box = std::make_shared<Box>(glm::vec3(0.8f, -0.4f, -0.5f), 0.2f, 0.2f, 0.2f, std::make_shared<Metal>(glm::vec3(0.9f, 0.9f, 0.9f), 0.0f));
-
-	m_list.emplace_back(one);
-	m_list.emplace_back(two);
-	m_list.emplace_back(three);
-	m_list.emplace_back(four);
-	m_list.emplace_back(five);
-
-	m_list.emplace_back(box);
+	if (_scene == 2)
+	{
+		//far wall
+		m_list.emplace_back(std::make_shared<Plane>(glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, -1.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.9f, 0.9f))));
+		//rear wall
+		m_list.emplace_back(std::make_shared<Plane>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 1.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.9f, 0.9f))));
+		//left wall
+		m_list.emplace_back(std::make_shared<Plane>(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.9f, 0.9f))));
+		//right wall
+		m_list.emplace_back(std::make_shared<Plane>(glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.9f, 0.9f))));
+		//ceiling
+		m_list.emplace_back(std::make_shared<Plane>(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.4f, 0.0f))));
+		//set up light
+		m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(0.0f, 1.0f, -1.0f), 0.2f, std::make_shared<DiffuseLight>(glm::vec3(4.0f, 4.0f, 4.0f))));
+	}
 }
 
 

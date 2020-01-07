@@ -18,6 +18,7 @@ public:
 	
 
 	virtual bool Scatter(Ray &_r_input, HitRecord &_rec, glm::vec3 &_attenuation, Ray &_r_scattered) { return false; }
+	virtual glm::vec3 Emitted() { return glm::vec3(0.0f, 0.0f, 0.0f); }
 };
 
 #endif

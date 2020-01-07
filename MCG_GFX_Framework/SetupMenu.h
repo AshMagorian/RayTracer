@@ -17,10 +17,14 @@ public:
 	void ChangeSamples();
 	void ChangeThreads();
 	void ChangeThreadMethod();
+	void ChangeDepth();
+	void ChangeScene();
 
 private:
 	int m_screenSizeOption;
 	int m_sampleNumber;
 	int m_numberOfThreads;
 	int m_multithreadingMethod;
+	int m_depth;
+	int m_scene;
 };

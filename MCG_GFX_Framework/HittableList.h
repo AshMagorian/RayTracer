@@ -11,7 +11,7 @@ class HittableList : public HittableObject
 public:
 	HittableList() {}
 
-	void SetupObjects();
+	void SetupObjects(int _scene);
 
 	virtual bool Hit(Ray &r, float tmin, float tmax, HitRecord &rec);
 private:

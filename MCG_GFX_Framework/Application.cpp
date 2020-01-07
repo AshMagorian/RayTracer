@@ -34,11 +34,11 @@ int Application::Run()
 {
 	MCG::SetBackground(glm::ivec3(0, 0, 0));
 
-	m_tracer = std::make_shared<Tracer>();
+	m_tracer = std::make_shared<Tracer>(m_depth, m_scene);
 	m_cam = std::make_shared<Camera>();
 
 	m_world = std::make_shared<HittableList>();
-	m_world->SetupObjects();
+	m_world->SetupObjects(m_scene);
 
 	srand(static_cast <unsigned> (time(0)));
 

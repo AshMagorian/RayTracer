@@ -12,22 +12,30 @@ glm::vec3 Tracer::ColourPixel(Ray& _r, std::shared_ptr<HittableObject> _world, i
 		Ray scattered;
 		glm::vec3 attenuation;
 
+		glm::vec3 emitted = rec.mat->Emitted();
+
 		//Limits the number of reflections of a single ray to 50
-		if (_depth < 50 && rec.mat->Scatter(_r, rec, attenuation, scattered))
+		if (_depth < m_depthMax && rec.mat->Scatter(_r, rec, attenuation, scattered))
 		{
 			// Attenuation is the light which the object absorbs (Which gives it colour). This vec3 is multiplied by the colour calculated from the reflected ray
-			return attenuation * ColourPixel(scattered, _world, _depth + 1);
+			return emitted + attenuation * ColourPixel(scattered, _world, _depth + 1);
 		}
-		else { return glm::vec3(0.0f, 0.0f, 0.0f); }
+		else { return emitted; }
 	}
 	else
 	{
-		// normalizes the ray direction
-		glm::vec3 unitDirection = glm::normalize(_r.GetDirection());
-		// scales t between 0 and 1
-		float t = 0.5f* (unitDirection.y + 1.0f);
-		//Uses lerping to give a gradient based on the value t
-		//return ((1.0f - t) *glm::vec3(1.0f, 0.1f, 0.0f)) + (t * glm::vec3( 1.0f, 0.0f, 1.0f));
-		return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
+		if (m_scene == 1)
+		{
+			// normalizes the ray direction
+			glm::vec3 unitDirection = glm::normalize(_r.GetDirection());
+			// scales t between 0 and 1
+			float t = 0.5f* (unitDirection.y + 1.0f);
+			//Uses lerping to give a gradient based on the value t
+			//return ((1.0f - t) *glm::vec3(1.0f, 0.1f, 0.0f)) + (t * glm::vec3( 1.0f, 0.0f, 1.0f));
+			return ((1.0f - t) *glm::vec3(1.0f, 1.0f, 1.0f)) + (t * glm::vec3(0.5f, 0.7f, 1.0f));
+		}
+
+		return glm::vec3(0.0f, 0.0f, 0.0f);
+
 	}
 }

@@ -19,7 +19,7 @@ class HittableObject
 {
 public:
 
-	virtual void SetupObjects() {}
+	virtual void SetupObjects(int _scene) {}
 
 	virtual bool Hit(Ray &_r, float _tmin, float _tmax, HitRecord &_rec) { return 0; }
 };
