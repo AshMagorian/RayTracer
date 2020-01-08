@@ -4,7 +4,8 @@ Box::Box(glm::vec3 _centrePoint, float _x, float _y, float _z, std::shared_ptr<M
 {
 	m_centrePoint = _centrePoint;
 
-	m_B0x = m_centrePoint.x - (_x / 2);
+	//defining the 6 planes of the faces of the box (x y and z are the width, height and depth)
+	m_B0x = m_centrePoint.x - (_x / 2); 
 	m_B1x = m_centrePoint.x + (_x / 2);
 	
 	m_B0y = m_centrePoint.y - (_y / 2);
@@ -18,13 +19,15 @@ Box::Box(glm::vec3 _centrePoint, float _x, float _y, float _z, std::shared_ptr<M
 
 bool Box::Hit(Ray& _r, float _tmin, float _tmax, HitRecord& _rec)
 {
-	//we need the largest tmin and the smallest tmax
+	//Checks if the box has been hit
 	bool isHit = false;
 
+	//checks if the min and max values have swapped
 	bool xSwapped = false;
 	bool ySwapped = false;
 	bool zSwapped = false;
 
+	//we need the largest tmin and the smallest tmax
 	float tmin = (m_B0x - _r.GetOrigin().x) / _r.GetDirection().x;
 	float tmax = (m_B1x - _r.GetOrigin().x) / _r.GetDirection().x;
 

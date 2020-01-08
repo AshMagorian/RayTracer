@@ -13,6 +13,8 @@ glm::vec3 Material::RandomInUnitSphere()
 	} while (glm::dot(rtn, rtn) >= 1.0f); //rejects if the point is located outside of the sphere
 	return rtn;
 
+	//I tried an alternative method for getting a random point in a sphere but it ended up being slower
+
 	//std::random_device generator;
 	//std::normal_distribution<float> distribution(0.5f, 0.125f);
 	//

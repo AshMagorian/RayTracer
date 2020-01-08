@@ -13,8 +13,8 @@ void HittableList::SetupObjects(int _scene)
 {
 	//set up spheres
 	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Lambertian>(glm::vec3(0.8f, 0.3f, 0.3f))));
-	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.9f, 0.1f, 0.2f), 0.3f)));
-	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, std::make_shared<Dielectric>(2.0f)));
+	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(1.2f, 0.0f, -1.0f), 0.5f, std::make_shared<Metal>(glm::vec3(0.9f, 0.1f, 0.2f), 0.3f)));
+	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(-1.2f, 0.0f, -1.0f), 0.5f, std::make_shared<Dielectric>(2.0f)));
 	m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(-1.5f, 1.0f, -3.0f), 1.5f, std::make_shared<Metal>(glm::vec3(0.2f, 0.6f, 0.5f), 0.0f)));
 	//set up cubes
 	m_list.emplace_back(std::make_shared<Box>(glm::vec3(0.8f, -0.4f, -0.5f), 0.2f, 0.2f, 0.2f, std::make_shared<Metal>(glm::vec3(0.9f, 0.9f, 0.9f), 0.0f)));
@@ -36,7 +36,8 @@ void HittableList::SetupObjects(int _scene)
 		//ceiling
 		m_list.emplace_back(std::make_shared<Plane>(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), std::make_shared<Lambertian>(glm::vec3(0.9f, 0.4f, 0.0f))));
 		//set up light
-		m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(0.0f, 1.0f, -1.0f), 0.2f, std::make_shared<DiffuseLight>(glm::vec3(4.0f, 4.0f, 4.0f))));
+		m_list.emplace_back(std::make_shared<Sphere>(glm::vec3(0.0f, 2.5f, -1.0f), 0.4f, std::make_shared<DiffuseLight>(glm::vec3(4.0f, 4.0f, 4.0f))));
+		m_list.emplace_back(std::make_shared<Box>(glm::vec3(1.5f, -0.4f, -0.5f), 0.2f, 0.2f, 0.1f, std::make_shared<DiffuseLight>(glm::vec3(2.0f, 2.0f, 2.0f))));
 	}
 }
 

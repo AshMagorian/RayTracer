@@ -31,6 +31,7 @@ bool Dielectric::Scatter(Ray &_r_input, HitRecord &_rec, glm::vec3 &_attenuation
 
 	if (Refract(_r_input.GetDirection(), outwardNormal, ni_over_nt, refracted))
 	{
+		//Rays which hit at a narrow angle have a higher chance to reflect
 		reflect_prob = Schlick(cosine, ref_idx);
 	}
 	else
@@ -43,10 +44,12 @@ bool Dielectric::Scatter(Ray &_r_input, HitRecord &_rec, glm::vec3 &_attenuation
 	float rndm = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
 	if (rndm < reflect_prob)
 	{
+		//ray is reflected
 		_r_scattered = Ray(_rec.p, reflected);
 	}
 	else
 	{
+		//ray is refracted
 		_r_scattered = Ray(_rec.p, refracted);
 	}
 
@@ -54,6 +57,7 @@ bool Dielectric::Scatter(Ray &_r_input, HitRecord &_rec, glm::vec3 &_attenuation
 
 }
 
+//Function by Christopher Schlick which calculates mirror qualities of glass when viewed at a narrow angle
 float Dielectric::Schlick(float cosine, float ref_idx)
 {
 	float r0 = (1.0f - ref_idx) / (1.0f+ref_idx);

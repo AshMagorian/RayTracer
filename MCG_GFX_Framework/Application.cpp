@@ -8,7 +8,6 @@
 #include <list>
 
 #include "MCG_GFX_Lib.h"
-#include "Sphere.h"
 #include "HittableList.h"
 #include "float.h"
 #include "Camera.h"
@@ -36,25 +35,29 @@ int Application::Run()
 
 	m_tracer = std::make_shared<Tracer>(m_depth, m_scene);
 	m_cam = std::make_shared<Camera>();
+	m_cam->Move(glm::vec3(0.0f, 0.2f, 0.5f));
 
 	m_world = std::make_shared<HittableList>();
 	m_world->SetupObjects(m_scene);
 
 	srand(static_cast <unsigned> (time(0)));
 
+	//Sets up values for calculating the percentage of rendering completed
 	m_pixelCount = 0;
 	m_newPixelPercent = 0.0f;
 	m_oldPixelPercent = 0.0f;
 
+	//Starts the clock for calculating the time rendered
 	m_start = clock();
 
 	switch (m_threadMethod)
 	{
-	case 1: BasicMultithreadingMethod(); break;
-	case 2: ThreadPoolMethod(); break;
+	case 1: BasicMultithreadingMethod(); break; // Divides the screen into blocks and assigns a thread to each block
+	case 2: ThreadPoolMethod(); break; // Uses a thread pool to assign threads to each line of pixels dynamically
 	default: break;
 	}
 
+	//Stops the clock
 	m_end = clock();
 	time_elapsed = double(m_end - m_start);
 	std::cout << "Time taken to render (ms): " << time_elapsed << std::endl;
@@ -64,6 +67,7 @@ int Application::Run()
 
 void Application::BasicMultithreadingMethod()
 {
+	//Assigns the size of the blocks depending on teh number of threads available
 	m_blockHeight = m_windowHeight / m_numberOfThreads;
 
 	std::list<std::thread> threads;
@@ -117,19 +121,23 @@ void Application::DrawPixel(int _currentPixel_x, int _currentPixel_y)
 	glm::vec3 col(0.0f, 0.0f, 0.0f);
 	for (int samples = 0; samples < m_numberOfSamples; samples++)
 	{
+		//Creates a random offset from the desired pixel for anti-aliasing
 		float rndm = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
 		float rayPosX = float(_currentPixel_x + rndm) / float(m_windowWidth);
 		rndm = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
 		float rayPosY = float(_currentPixel_y + rndm) / float(m_windowHeight);
 
+		//Fires a ray at that point and determines it's colour
 		Ray r = m_cam->GetRay(rayPosX, rayPosY);
 		glm::vec3 p = r.PointAtParameter(2.0f);
 		col += m_tracer->ColourPixel(r, m_world, 0);
 	}
-
+	//Determines the average colour for the selected pixel
 	col /= float(m_numberOfSamples);
 	col = glm::vec3(glm::sqrt(col.x), glm::sqrt(col.y), glm::sqrt(col.z));
-
+	if (col.x > 1.0f) { col.x = 1.0f; }
+	if (col.y > 1.0f) { col.y = 1.0f; }
+	if (col.z > 1.0f) { col.z = 1.0f; }
 	int ir = int(255.99f * col[0]);
 	int ig = int(255.99f * col[1]);
 	int ib = int(255.99f * col[2]);
@@ -142,7 +150,7 @@ void Application::DrawPixel(int _currentPixel_x, int _currentPixel_y)
 
 		MCG::DrawPixel(pixelPosition, pixelColour);
 
-
+		//Prints to the screen at 10% completion intervals
 		m_newPixelPercent = (float(m_pixelCount) / (float(m_windowWidth) * float(m_windowHeight)))* 100.0f;
 		if (int(m_newPixelPercent) > int(m_oldPixelPercent + 9.0f))
 		{
