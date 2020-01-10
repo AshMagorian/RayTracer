@@ -129,13 +129,13 @@ void SetupMenu::ChangeSamples()
 void SetupMenu::ChangeThreads()
 {
 	system("CLS");
-	std::cout << "Enter the amount of threads you would like to use (max " << std::thread::hardware_concurrency() <<"):\n\n";
+	std::cout << "Enter the amount of threads you would like to use (current number of processors: " << std::thread::hardware_concurrency() <<"):\n\n";
 
 	int option = 0;
 
 	std::cin >> option;
 
-	while (option < 1 || option > std::thread::hardware_concurrency())
+	while (option < 1 || option > 1000)
 	{
 		std::cout << "\nInvalid input! Try again!\n";
 		std::cin >> option;
